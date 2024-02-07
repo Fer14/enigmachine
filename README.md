@@ -67,6 +67,9 @@ message = "HELLO WORLD"
 encrypted = m.encrypt(message)
 ```
 
+You can watch an example of usage in the following [notebook](example.ipynb)
+
+
 ## Contributing
 
 If you would like to contribute to this project, please follow these steps:
