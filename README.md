@@ -1,7 +1,7 @@
 # Enigma
 
 
-![logo](https://github.com/Fer14/enigmachine/logos/white.png)
+![logo](logos/white.png)
 
 A simple Python-library of the famous enigma machine.
 
@@ -111,4 +111,4 @@ The references that help me build this library are:
 - https://www.codesandciphers.org.uk/enigma/example1.htm
 - https://www.youtube.com/watch?v=Kz6IlDCyOUY
 
-![logos](https://github.com/Fer14/enigmachine/logos/black.png)
+![logos](logos/black.png)
