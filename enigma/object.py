@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
-import random
 
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
+
 class MachineObject(ABC):
     @abstractmethod
-    def encrypt(self, letter: str) -> str:
+    def forward(self, letter: str) -> str:
         pass
 
 
@@ -14,62 +14,63 @@ class Rotor(MachineObject):
     A rotor is characterized by its position
     """
 
-    def __init__(self, position: int, letter_ordering: list = None):
+    def __init__(self, offset: int, wiring: str, name: str = None):
         """_summary_
 
         Parameters
         ----------
-        position : int
-            The initial position of the rotor. Must be between 1 and 26
-        letter_ordering : list, optional
-            The ordering of the letters in the rotor, by default None
+        offset : int
+            The initial offset of the rotor. Must be between 0 and 25
+        wiring : str
+            The ordering of the letters in the rotor
+        name: str, optional
+            The name of the rotor, by default None
 
         Raises
         ------
         AssertionError
             If the position is not within the valid range.
         """
-        assert 1 <= position <= 26, "Rotor position must be between 1 and 26"
-        self.rotor_position = position
-        if letter_ordering is not None:
-            assert all(
-                [len(letter_ordering) == 26, set(letter_ordering) == set(LETTERS)]
-            ), "Letter ordering must contain exactly 26 letters"
-        else:
-            shuffled_letters = list(LETTERS)
-            random.shuffle(shuffled_letters)
-            self.letters = shuffled_letters
+        self.name = name
+        assert 0 <= offset <= 25, "Rotor position must be between 0 and 25"
+        self.offset = offset
+        assert all(
+            [len(wiring) == 26, set(wiring) == set(LETTERS)]
+        ), "Letter ordering must contain exactly 26 letters in wiring"
+        self.wiring = wiring
 
     def __str__(self):
-        return f"Rotor instance with position: {self.rotor_position}"
+        return f"Rotor instance {self.name if self.name is not None else ''} with offset: {self.offset} and wiring: {self.wiring}"
 
-    def change_position(self, position: int):
+    def change_position(self, offset: int):
         """Change the position of the rotor.
 
         Parameters
         ----------
-        position : int
-            The new position of the rotor.
+        offset : int
+            The new offset of the rotor.
 
         Raises
         ------
         AssertionError
-            If the position is not within the valid range.
+            If the offset is not within the valid range.
         """
-        assert 1 <= position <= 26, "Rotor position must be between 1 and 26"
-        self.rotor_position = position
+        assert 1 <= offset <= 26, "Rotor offset must be between 1 and 26"
+        self.offset = offset
 
     def click_rotor(self):
         """Rotate the rotor by one position."""
-        self.rotor_position = (self.rotor_position + 1) % 26
+        self.offset = (self.offset + 1) % 26
 
-    def encrypt(self, letter: str) -> str:
+    def forward(self, letter: str, verbose: bool = False) -> str:
         """Encrypt a letter using the current rotor position.
 
         Parameters
         ----------
         letter : str
             The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
 
         Returns
         -------
@@ -81,12 +82,43 @@ class Rotor(MachineObject):
         AssertionError
             If the letter is not a capital English letter.
         """
-        assert letter in self.letters, "Letter must be a capital english letter"
-        letter_index = self.letters.index(letter)
-        encrypted_letter_index = (letter_index + self.rotor_position) % 26
-        return self.letters[encrypted_letter_index]
-    
+        assert letter in self.wiring, "Letter must be a capital english letter"
+        letter_index = LETTERS.index(letter)
+        encrypted_letter_index = (letter_index + self.offset) % 26
+        if verbose:
+            print(
+                f"Encrypting {letter} to {self.wiring[encrypted_letter_index]} with rotor {self.name if self.name is not None else ''} at offset {self.offset}"
+            )
+        return self.wiring[encrypted_letter_index]
 
+    def inverse(self, letter: str, verbose: bool = False) -> str:
+        """Encrypt a letter using the current rotor position.
+
+        Parameters
+        ----------
+        letter : str
+            The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
+
+        Returns
+        -------
+        str
+            The encrypted letter.
+
+        Raises
+        ------
+        AssertionError
+            If the letter is not a capital English letter.
+        """
+        assert letter in self.wiring, "Letter must be a capital english letter"
+        letter_index = self.wiring.index(letter)
+        encrypted_letter_index = (letter_index - self.offset) % 26
+        if verbose:
+            print(
+                f"Encrypting {letter} to {LETTERS[encrypted_letter_index]} with rotor {self.name} at offset {self.offset}"
+            )
+        return LETTERS[encrypted_letter_index]
 
 
 class RotorMechanism(MachineObject):
@@ -111,7 +143,6 @@ class RotorMechanism(MachineObject):
         AssertionError
             If any element in rotors is not an instance of the Rotor class.
         """
-
         assert all(isinstance(rotor, Rotor) for rotor in rotors)
         self.rotors = rotors
         self.clicks = 0
@@ -129,14 +160,16 @@ class RotorMechanism(MachineObject):
         for rotor in self.rotors:
             s += f"\n{rotor}"
         return s
-    
-    def encrypt(self, letter: str) -> str:
+
+    def forward(self, letter: str, verbose: bool = False) -> str:
         """Encrypt a letter using the Enigma machine.
 
         Parameters
         ----------
         letter : str
             The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
 
         Returns
         -------
@@ -144,17 +177,19 @@ class RotorMechanism(MachineObject):
             The encrypted letter.
         """
         if self.inverse:
-            return self.encrypt_inverse(letter)
+            return self._inverse(letter, verbose)
         else:
-            return self.encrypt_forward(letter)
+            return self._forward(letter, verbose)
 
-    def encrypt_forward(self, letter: str) -> str:
+    def _forward(self, letter: str, verbose: bool = False) -> str:
         """Encrypt a letter in the forward direction using the Enigma machine.
 
         Parameters
         ----------
         letter : str
             The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
 
         Returns
         -------
@@ -164,20 +199,22 @@ class RotorMechanism(MachineObject):
         Raises
         ------
         AssertionError
-            If any element in rotors is not an instance of the Rotor class.
+            If the letter is not a capital English letter.
         """
         assert letter in LETTERS, "Letter must be a capital english letter"
         for rotor in self.rotors:
-            letter = rotor.encrypt(letter)
+            letter = rotor.forward(letter, verbose)
         return letter
 
-    def encrypt_inverse(self, letter: str) -> str:
+    def _inverse(self, letter: str, verbose: bool = False) -> str:
         """Encrypt a letter in the inverse direction using the Enigma machine.
 
         Parameters
         ----------
         letter : str
             The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
 
         Returns
         -------
@@ -187,11 +224,11 @@ class RotorMechanism(MachineObject):
         Raises
         ------
         AssertionError
-            If any element in rotors is not an instance of the Rotor class.
+            If the letter is not a capital English letter.
         """
         assert letter in LETTERS, "Letter must be a capital english letter"
         for rotor in reversed(self.rotors):
-            letter = rotor.encrypt(letter)
+            letter = rotor.inverse(letter, verbose)
         self.click()
         return letter
 
@@ -199,39 +236,41 @@ class RotorMechanism(MachineObject):
 class PlugBoard(MachineObject):
     """Class representing a plugboard in an Enigma machine."""
 
-    def __init__(self, connections: dict = None):
-        """Initialize the plugboard with given connections.
+    def __init__(self, wiring: dict = None):
+        """Initialize the plugboard with given wiring.
 
         Parameters
         ----------
-        connections : dict, optional
-            A dictionary representing connections in the plugboard., by default None
+        wiring : dict, optional
+            A string representing wiring in the plugboard, by default None
 
         Raises
         ------
         AssertionError
-            If connections is not a dictionary or if it doesn't meet
-            the requirements for a valid connections dictionary.
+            If wiring is not a dictionary or if it doesn't meet
+            the requirements for a valid wiring dictionary.
         """
-        if connections is not None:
-            assert isinstance(connections, dict), "Connections must be a dictionary"
+        if wiring is not None:
+            assert isinstance(wiring, dict), "Wiring must be a dictionary"
             assert all(
-                [key in LETTERS for key in connections.keys()]
-            ), "Connections must be a dictionary containing english letters"
-            self.connections = connections
+                [key in LETTERS for key in wiring.keys()]
+            ), "Wiring must be a dictionary containing english letters"
+            self.wiring = wiring
         else:
-            self.connections = {}
+            self.wiring = {}
 
     def __str__(self):
-        return f"PlugBoard instance with connections: {self.connections}"
+        return f"PlugBoard instance with wiring: {self.wiring}"
 
-    def encrypt(self, letter: str) -> str:
+    def forward(self, letter: str, verbose: bool = False) -> str:
         """Encrypt a letter using the plugboard.
 
         Parameters
         ----------
         letter : str
             The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
 
         Returns
         -------
@@ -244,51 +283,48 @@ class PlugBoard(MachineObject):
             If the letter is not a capital English letter.
         """
         assert letter in LETTERS, "Letter must be a capital english letter"
-        return self.connections.get(letter, letter)
+        if verbose:
+            print(
+                f"Encrypting {letter} to {self.wiring.get(letter, letter)} with plugboard"
+            )
+        return self.wiring.get(letter, letter)
 
 
 class Reflector(MachineObject):
     """Class representing a reflector in an Enigma machine."""
 
-    def __init__(self, connections: dict = None):
+    def __init__(self, wiring: str, name: str = None):
         """Initialize the reflector.
 
         Parameters
         ----------
-        connections : dict, optional
-            A dictionary representing connections in the reflector, by default None
+        wiring : dict
+            A dictionary representing wiring in the reflector, by default None
 
         Raises
         ------
         AssertionError
-            If connections is not a dictionary or if it doesn't meet
-            the requirements for a valid connections dictionary.
+            If wiring is not a dictionary or if it doesn't meet
+            the requirements for a valid wiring dictionary.
         """
-        if connections is not None:
-            assert isinstance(connections, dict), "Connections must be a dictionary"
-            assert all(
-                [
-                    len(connections) == 26,
-                    set(connections.keys()) == set(LETTERS),
-                    set(connections.values()) == set(LETTERS),
-                ]
-            ), "Connections must be a dictionary with 26 keys and values"
-            self.connections = connections
-        else:
-            shuffled_letters = list(LETTERS)
-            random.shuffle(shuffled_letters)
-            self.connections = {i: o for i, o in zip(LETTERS, shuffled_letters)}
+        assert all(
+            [len(wiring) == 26, set(wiring) == set(LETTERS)]
+        ), "Letter ordering must contain exactly 26 letters"
+        self.wiring = wiring
+        self.name = name
 
     def __str__(self):
-        return f"Reflector instance with connections: {self.connections}"
+        return f"Reflector instance {self.name if self.name is not None else ''} with wiring: {self.wiring}"
 
-    def encrypt(self, letter: str) -> str:
+    def forward(self, letter: str, verbose: bool = False) -> str:
         """Encrypt a letter using the reflector.
 
         Parameters
         ----------
         letter : str
             The letter to encrypt.
+        verbose : bool, optional
+            If True, prints the encryption process.
 
         Returns
         -------
@@ -300,5 +336,8 @@ class Reflector(MachineObject):
         AssertionError
             If the letter is not a capital English letter.
         """
-        assert letter in LETTERS, "Letter must be a capital english letter"
-        return self.connections[letter]
+        assert letter in self.wiring, "Letter must be a capital english letter"
+        letter_index = LETTERS.index(letter)
+        if verbose:
+            print(f"Encrypting {letter} to {self.wiring[letter_index]} with reflector")
+        return self.wiring[letter_index]
