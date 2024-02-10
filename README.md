@@ -61,7 +61,6 @@ The EnigmaMachine class takes the following parameters:
 
 The library comes with a set of predefined machines that you can use. The machines can be seen [here](./enigma/configurations.py)
 
-```python
 
 ## Custom Machine
 
