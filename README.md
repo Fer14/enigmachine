@@ -61,6 +61,16 @@ The EnigmaMachine class takes the following parameters:
 
 The library comes with a set of predefined machines that you can use. The machines can be seen [here](./enigma/configurations.py)
 
+```python
+enigma = EnigmaMachine.from_configuration(
+    rotor_config=ROTOR_CONFIGURATIONS['Commercial Enigma A, B'],
+    rotor_offsets = [0,0,0],
+    reflector_config=REFLECTOR_CONFIGURATIONS['A'],
+    plugboard_wirings = {}
+)
+```
+
+
 
 ## Custom Machine
 
