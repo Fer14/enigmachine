@@ -1,7 +1,7 @@
 # Enigma
 
 
-![logo](logos/white.png)
+![logo](https://github.com/Fer14/enigmachine/logos/white.png)
 
 A simple Python-library of the famous enigma machine.
 
@@ -59,7 +59,7 @@ The EnigmaMachine class takes the following parameters:
 
 ## Predefined Machines
 
-The library comes with a set of predefined machines that you can use. The machines can be seen [here](./enigma/configurations.py)
+The library comes with a set of predefined machines that you can use. The machines can be seen [here](https://github.com/Fer14/enigmachine/blob/main/enigma/configurations.py)
 
 ```python
 enigma = EnigmaMachine.from_configuration(
@@ -88,7 +88,7 @@ custom_machine = Machine(
 )
 ```
 
-You can watch an example of usage in the following [notebook](examples.ipynb)
+You can watch an example of usage in the following [notebook](https://github.com/Fer14/enigmachine/blob/main/examples.ipynb)
 
 
 ## Contributing
@@ -109,5 +109,6 @@ If you would like to contribute to this project, please follow these steps:
 The references that help me build this library are:
 - https://www.youtube.com/watch?v=ybkkiGtJmkM&t=245s
 - https://www.codesandciphers.org.uk/enigma/example1.htm
+- https://www.youtube.com/watch?v=Kz6IlDCyOUY
 
-![logos](logos/black.png)
+![logos](https://github.com/Fer14/enigmachine/logos/black.png)
