@@ -1,7 +1,7 @@
 # Enigma
 
 
-![logo](logos/white.png)
+![](logos/white.png)
 
 A simple Python-library of the famous enigma machine.
 
@@ -51,7 +51,7 @@ The EnigmaMachine class takes the following parameters:
 
 * `reflector_wirings`: A string representing the wiring of the reflector. The wiring is a permutation of the 26 letters of the alphabet.
 
-* `plugboard_connections`: A dictionary representing the connections of the plugboard. The keys are the letters of the alphabet, and the values are the letters that they are connected to. For example, if the value of the key "A" is "Z", it means that the letter "A" is connected to the letter "Z".
+* `plugboard_wirings`: A dictionary representing the connections of the plugboard. The keys are the letters of the alphabet, and the values are the letters that they are connected to. For example, if the value of the key "A" is "Z", it means that the letter "A" is connected to the letter "Z".
 
 * `rotor_names`: A list of strings, each string represents the name of a rotor. The first string is the name of the rightmost rotor, the second string is the name of the middle rotor, and the third string is the name of the leftmost rotor. The name of a rotor is a string of 26 letters, each letter represents the position of the rotor when the letter "A" is at the top position.
 
@@ -81,7 +81,7 @@ Alternatively, you can build you own custom machine with your own set of compone
 
 custom_machine = Machine(
     [
-        PlugBoard(wiring={"A":"B"}),
+    PlugBoard(wiring={"A":"B"}),
     Rotor(wiring="EKMFLGDQVZNTOWYHXUSPAIBRCJ",offset=0),
     Reflector(wiring="YRUHQSLDPXNGOKMIEBFZCWVJAT")
     ]
@@ -111,4 +111,4 @@ The references that help me build this library are:
 - https://www.codesandciphers.org.uk/enigma/example1.htm
 - https://www.youtube.com/watch?v=Kz6IlDCyOUY
 
-![logos](logos/black.png)
+![](logos/black.png)
