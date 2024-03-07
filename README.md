@@ -5,11 +5,11 @@
 
 A simple Python-library of the famous enigma machine.
 
-## Requirements
+## Instalation
 
-To run this code, you need:
-
-    Python 3.x
+```bash
+pip install enigmachine
+```
 
 ## Usage
 
